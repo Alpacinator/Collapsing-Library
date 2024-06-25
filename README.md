@@ -1,16 +1,6 @@
-# Spicetify Creator
+# Collapsing Library for Spicetify
 
-Spicetify Creator is a tool to compile modern Typescript/Javascript code to Spicetify extensions and custom apps.
-
-## Features
-- Typescript and React syntax
-- Import node packages
-- CSS/SCSS with PostCSS support
-- Extremely fast compile time with esbuild.
-- Plugins
-
-## Docs
-Check out [Spicetify's docs](https://spicetify.app/docs/development/spicetify-creator/the-basics)!
+This is the first version of this extension that should make the Spotify Library easier to use. No longer do you have to navigate through folders, you can now just click on them to have them expand. Like the good old days.
 
 ## Made with Spicetify Creator
 - https://github.com/spicetify/spicetify-creator
