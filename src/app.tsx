@@ -21,7 +21,7 @@ async function main() {
 			width: 100%;
 			height: 100%;
 			position: absolute;	
-			z-index: 30;
+			z-index: 20;
 		}
 
 		li .Box__BoxComponent-sc-y4nds-0 .Areas__HeaderArea-sc-8gfrea-3 .Areas__TrailingSlot-sc-8gfrea-7 button {
@@ -29,16 +29,20 @@ async function main() {
 			left: 0px;
 			width: 100%;
 			height: 100%;
-			background-color: grey;
+			background-color: transparant;
 			opacity: 0.4;
-			z-index: 100;
-			border: 0px solid black;
-			border-radius: 5px;
+			z-index: 30;
+			border-left: 4px solid grey;
+			border-radius: 0px;
 			transform: scale(1) !important;
 		}
 		
 		button .IconWrapper__Wrapper-sc-16usrgb-0{
 			display: none;
+		}
+		
+		.main-yourLibraryX-collapseButton button span {
+			display: block;
 		}
 	`;
 
