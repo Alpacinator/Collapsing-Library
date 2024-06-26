@@ -39,12 +39,8 @@
 			transform: scale(1) !important;
 		}
 		
-		button .IconWrapper__Wrapper-sc-16usrgb-0{
+		li .BRX6aJUAuAsvHKD_fpbo .HeaderArea .Areas__InteractiveArea-sc-8gfrea-0 button .IconWrapper__Wrapper-sc-16usrgb-0{
 			display: none;
-		}
-		
-		.main-yourLibraryX-collapseButton button span {
-			display: block;
 		}
 	`;
     if (style.styleSheet) {
