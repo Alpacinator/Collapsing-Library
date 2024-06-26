@@ -6,7 +6,7 @@
     "main": "collapsing-library.js",
     "readme": "README.md",
     "authors": [
-        { "name": "Aiko", "url": "https://github.com/aiko94/SpotifyCollapsingLibrary" }
+        { "name": "Aiko", "url": "https://github.com/Alpacinator/Collapsing-Library" }
     ],
     "tags": ["library", "folders"]
   }
