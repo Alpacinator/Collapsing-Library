@@ -1,12 +1,12 @@
 [
   {
-    "name": "Spicetify Collapsing Library",
-    "description": "This turns the library in one with expanding folders without having to click on the little triangle.",
+    "name": "Collapsing Library",
+    "description": "This turns the Spotify library in one with expanding folders without having to click on the little triangle.",
     "preview": "screenshot.png",
     "main": "collapsing-library.js",
     "readme": "README.md",
     "authors": [
-        { "name": "Aiko", "url": "https://github.com/Alpacinator/Collapsing-Library" }
+        { "name": "Alpacinator", "url": "https://github.com/Alpacinator/Collapsing-Library" }
     ],
     "tags": ["library", "folders"]
   }
