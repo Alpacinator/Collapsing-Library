@@ -9,40 +9,41 @@ async function main() {
 
 	// Define the CSS rules
 	var css = `
-		
-		li .Box__BoxComponent-sc-y4nds-0{
-			position: relative;
-			z-index: 10;
-			width: 100%;
-			height: 100%;
-		}
-		
-		li .Box__BoxComponent-sc-y4nds-0 .RowButton-sc-xxkq4e-0{
-			width: 100%;
-			height: 100%;
-			position: absolute;	
-			z-index: 20;
-		}
+		#spicetify-playlist-list {
+			li .Box__BoxComponent-sc-y4nds-0{
+				position: relative;
+				z-index: 10;
+				width: 100%;
+				height: 100%;
+			}
 
-		li .Box__BoxComponent-sc-y4nds-0 .Areas__HeaderArea-sc-8gfrea-3 .Areas__TrailingSlot-sc-8gfrea-7 button {
-			position: absolute;
-			left: 0px;
-			width: 100%;
-			height: 100%;
-			background-color: transparant;
-			opacity: 0.4;
-			z-index: 30;
-			border-left: 4px solid grey;
-			border-radius: 0px;
-			transform: scale(1) !important;
-		}
-		
-		button .IconWrapper__Wrapper-sc-16usrgb-0{
-			display: none;
-		}
-		
-		.main-yourLibraryX-collapseButton button span {
-			display: block;
+			li .Box__BoxComponent-sc-y4nds-0 .RowButton-sc-xxkq4e-0{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				z-index: 20;
+			}
+
+			li .Box__BoxComponent-sc-y4nds-0 .Areas__HeaderArea-sc-8gfrea-3 .Areas__TrailingSlot-sc-8gfrea-7 button {
+				position: absolute;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+				background-color: transparant;
+				opacity: 0.4;
+				z-index: 30;
+				border-left: 4px solid grey;
+				border-radius: 0px;
+				transform: scale(1) !important;
+			}
+
+			button .IconWrapper__Wrapper-sc-16usrgb-0{
+				display: none;
+			}
+
+			.main-yourLibraryX-collapseButton button span {
+				display: block;
+			}
 		}
 	`;
 
