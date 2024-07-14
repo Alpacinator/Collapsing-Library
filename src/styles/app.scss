@@ -1,0 +1,110 @@
+// @note - basically just made the selectors a little more robust and resistant to Spotify making random class name changes; also made sure the styles are only applied to the navbar items
+
+#spicetify-playlist-list {
+
+	// @desc - Controls the indicator color, depending on the open/closed/hover state of a folder
+	--collapsing-library-folder-indicator-color: rgba(var(--spice-rgb-button-active), 0.3);
+
+	// @desc - Controls the indicator height, depending on the open/closed/hover state
+	--collapsing-library-folder-indicator-scale: 0.5;
+
+	// @desc - Controls the padding of the list item - not necessary, but if Spotify change the values, this should keep it up to date...maybe
+	--collapsing-library-folder-padding: var(--encore-spacing-tighter-2, 4px);
+
+	li[role="listitem"],
+	li.main-yourLibraryX-listItem { 
+		> [data-encore-id="listRow"],
+		> .Box__BoxComponent-sc-y4nds-0 {
+			position: relative;
+			z-index: 10;
+			width: 100%;
+			height: 100%;
+
+			> div[role="button"][aria-labelledby*=":folder:"]
+			> .RowButton-sc-xxkq4e-0{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				z-index: 20;
+			}
+
+			> .HeaderArea,
+			> :last-child,
+			> .Areas__HeaderArea-sc-8gfrea-3 {
+				> :last-child,
+				> .Areas__TrailingSlot-sc-8gfrea-7 {
+					> button {
+						position: absolute;
+						left: 0px;
+						width: 100%;
+						height: 100%;
+						background-color: transparent;
+						opacity: 0.4;
+						z-index: 30;
+						// @note - hiding the border because the pseuedo element is handling that effect now
+						border-left: 4px solid rgba(var(--spice-rgb-button-active), 0.0);
+						border-radius: 0px;
+						transform: scale(1) !important;
+
+						// @note - this span holds the open/close icon we want to hide
+						.IconWrapper__Wrapper-sc-16usrgb-0{
+							display: none;
+						}
+				
+						// @what - On hover, provide a little indication that the item can be clicked.
+						// @why - Not needed, but it serves as a reminder that you can interact with the folder.
+						&:hover {
+							--collapsing-library-folder-indicator-color: rgba(var(--spice-rgb-button-active), 0.6);
+							--collapsing-library-folder-indicator-scale: 0.9;
+						}
+				
+						// @what - A pseudo element which we use as the indicator (instead of the button's left border).
+						// @why - We can control the height and color by altering the --collapsing-library variables without effecting the dimensions of the clickable area provided by the button.
+						&::before {
+							content: "";
+							position: absolute;
+							inset: var(--collapsing-library-folder-padding, 4) auto var(--collapsing-library-folder-padding) -4px;
+							scale: 1 var(--collapsing-library-folder-indicator-scale);
+							display: block;
+							background: var(--collapsing-library-folder-indicator-color);
+							z-index: 31;
+							width: 4px;
+							transition-property: background, scale;
+							transition-duration: 100ms;
+							transition-timing-function: linear;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.main-yourLibraryX-collapseButton button span {
+		display: block;
+	}
+
+	// @note - Here is where we handle the open/closed/hover state of the folders.
+	// . Currently only works for root level folders, but I think I can adapt it to work for any depth.
+	// = this now works for 10 levels deep, and can be adjusted if needed.
+	// @how - we compare the --ylx-folder depth of the current folder to the depth of the next item to check if the folder is open or not; if the value is higher, we know the folder is open, this process continues for nested folders (up to 10 levels deep, which can be altered by changing the ).
+
+	li.main-yourLibraryX-listItem[role="listitem"] {
+		$i: 0;
+		$max-depth: 10;
+		@while ($i < $max-depth) {
+			&[style*="--ylx-folder-depth: #{$i}"] {
+				&:has(+ li[style*="--ylx-folder-depth: #{$i + 1}"]) {
+					.Box__BoxComponent-sc-y4nds-0 .Areas__HeaderArea-sc-8gfrea-3 .Areas__TrailingSlot-sc-8gfrea-7 {
+						button {
+							&::before {
+								--collapsing-library-folder-indicator-color: rgba(var(--spice-rgb-button-active), 1);
+								--collapsing-library-folder-indicator-scale: 1;
+							}
+						}
+					}
+				}
+			}
+			$i: $i + 1;
+		}
+	}
+}
