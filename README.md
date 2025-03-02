@@ -6,7 +6,7 @@ This extension should make the Spotify Library easier to use. No longer do you h
 
 It looks the best with the library in compact mode, the list mode works as well but I have to add some kind of settings page with a toggle to disable the left border.
 
-It does not work wit the library in grid mode, but it doesn't break anything as far as I know.
+It does not work well with the library in grid mode, but it doesn't break anything.
 
 
 ## Made with Spicetify Creator
