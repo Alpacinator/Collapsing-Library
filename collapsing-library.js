@@ -19,8 +19,31 @@
 			var style = document.createElement("style");
 			style.type = "text/css";
 			var css = `
-				li .Box__BoxComponent-sc-y4nds-0 {
-					width: max-content !important;
+				li .Box__BoxComponent-sc-y4nds-0{
+					position: relative;
+					z-index: 10;
+					width: 100%;
+				}
+
+				li .Box__BoxComponent-sc-y4nds-0 .RowButton-sc-xxkq4e-0{
+					width: 100%;
+					position: absolute;	
+					z-index: 20;
+				}
+
+				li .Box__BoxComponent-sc-y4nds-0 .Areas__HeaderArea-sc-8gfrea-3 .Areas__TrailingSlot-sc-8gfrea-7 button {
+					position: absolute;
+					left: 0px;
+					width: 100%;
+					height: 100%;
+					z-index: 30;
+					transform: scale(1) !important;
+					border: none !important;
+					opacity: 100 !important;
+				}
+
+				li .BRX6aJUAuAsvHKD_fpbo .HeaderArea .Areas__InteractiveArea-sc-8gfrea-0 button .IconWrapper__Wrapper-sc-16usrgb-0{
+					display: none;
 				}
 
 				button.collapse-button::before {
@@ -29,7 +52,7 @@
 					top: 50%;
 					left: 0px;
 					width: 5px;
-					opacity: 1 !important;
+					opacity: 100 !important;
 					height: 50%;
 					background-color: ${COLLAPSE_FOLDER_INDICATOR_COLOR};
 					border-radius: 5px;
@@ -42,7 +65,7 @@
 					top: 50%;
 					left: 0px;
 					width: 5px;
-					opacity: 1;
+					opacity: 100%;
 					height: 50%;
 					background-color: ${EXPAND_FOLDER_INDICATOR_COLOR};
 					border-radius: 5px;
@@ -79,33 +102,18 @@
 				});
 			};
 
-			// Function to pad the bottom of the library to extend it a bit, fixes some scrolling issues
-			// We use the height of the 'Now Playing' bar as a base
-			const extendLibrary = () => {
-				const nowPlayingBar = document.querySelector('.main-nowPlayingBar-nowPlayingBar');
-				const libraryList = document.querySelector('ul[role="list"][aria-label="Your Library"]');
-
-				if (nowPlayingBar && libraryList) {
-					const nowPlayingHeight = nowPlayingBar.offsetHeight * 2;
-					libraryList.style.paddingBottom = `${nowPlayingHeight}px`;
-				}
-			};
-			
-
-			// Call hideSVGIcons, updateFolderIndicators, and extendLibrary when the page loads
+			// Call hideSVGIcons and updateFolderIndicators when the page loads
 			hideSVGIcons();
 			updateFolderIndicators();
-			extendLibrary();
 
 			// Create a MutationObserver to watch for changes in the page and execute hideSVGIcons & updateFolderIndicators on each update
 			const observer = new MutationObserver((mutationsList) => {
 				mutationsList.forEach((mutation) => {
 					// Check if any added or removed nodes are relevant to our use case
 					if (mutation.type === 'childList') {
-						// Call hideSVGIcons, updateFolderIndicators, and extendLibrary on updates in the library
+						// Call hideSVGIcons and updateFolderIndicators on updates in the library
 						hideSVGIcons();
 						updateFolderIndicators();
-						extendLibrary();
 					}
 				});
 			});
