@@ -25,6 +25,15 @@
 					width: max-content !important;
 				}
 
+				.JUPaw8kZF94Coth4G88s>*, [dir=ltr] .JUPaw8kZF94Coth4G88s>:hover {
+					display: none !important;
+				}
+				
+				.e-9640-button-tertiary--condensed .e-9640-button__icon-wrapper, .e-9640-button-tertiary--icon-only .e-9640-button__icon-wrapper {
+					position: static;
+					display: none;
+				}
+
 				li .Box__BoxComponent-sc-y4nds-0 .RowButton-sc-xxkq4e-0{
 					width: 100% !important;
 					position: absolute;	
