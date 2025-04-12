@@ -26,7 +26,7 @@
 				}
 
 				li .Box__BoxComponent-sc-y4nds-0 .RowButton-sc-xxkq4e-0{
-					width: max-content;
+					width: 100% !important;
 					position: absolute;	
 					z-index: 20;
 				}
@@ -34,7 +34,7 @@
 				li .Box__BoxComponent-sc-y4nds-0 .Areas__HeaderArea-sc-8gfrea-3 .Areas__TrailingSlot-sc-8gfrea-7 button {
 					position: absolute;
 					left: 0px;
-					width: max-content;
+					width: 100% !important;
 					height: 100%;
 					z-index: 30;
 					transform: scale(1) !important;
