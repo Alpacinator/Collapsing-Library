@@ -1,77 +1,116 @@
 (async function() {
 	// Define color variables
 	const HOVER_FOLDER_INDICATOR_COLOR = 'yellow';
-	
 	const EXPAND_FOLDER_INDICATOR_COLOR = 'white';
 	const COLLAPSE_FOLDER_INDICATOR_COLOR = 'green';
-	
+
+	console.log("Script started: Waiting for Spicetify.React and Spicetify.ReactDOM");
+
 	while (!Spicetify.React || !Spicetify.ReactDOM) {
-		await new Promise(resolve => setTimeout(resolve, 10));
+		await new Promise(resolve => setTimeout(resolve, 100));
 	}
+
+	console.log("Spicetify.React and ReactDOM loaded");
+
 	var collapsingDlibrary = (() => {
 		// src/app.tsx
 		async function main() {
-			while (!(Spicetify == null ? void 0 : Spicetify.showNotification)) {
+			console.log("Main function started: Waiting for Spicetify.showNotification");
+
+			while (!(Spicetify?.showNotification)) {
 				await new Promise((resolve) => setTimeout(resolve, 100));
 			}
 
-			// Add styles
-			var style = document.createElement("style");
-			style.type = "text/css";
-			var css = `
-				li .Box__BoxComponent-sc-y4nds-0{
-					position: relative;
-					z-index: 10;
-					width: max-content !important;
-				}
+			console.log("Spicetify.showNotification available, injecting styles");
 
-				.JUPaw8kZF94Coth4G88s>*, [dir=ltr] .JUPaw8kZF94Coth4G88s>:hover {
+			// Add styles
+			const style = document.createElement("style");
+			style.type = "text/css";
+			const css = `
+				.cRPTAY {
+					position: absolute;
+					z-index: 300;
+					inset: 0px;
+					cursor: pointer;
+					background-color: transparent;
+					border: none;
+					width: 100%;
+				}
+				
+				/* hide the buttons that go into folders, leave those for playlistst alone*/
+				
+				div[role="button"][aria-labelledby^="listrow-title-spotify:user:"] {
 					display: none !important;
 				}
 				
-				.Areas__InteractiveArea-sc-8gfrea-0 .collapse-button span {
-				  display: none;
-				}
-
-				li .Box__BoxComponent-sc-y4nds-0 .RowButton-sc-xxkq4e-0{
+				.HeaderArea {
+					position: relative !important;
 					width: 100% !important;
-					position: absolute;	
-					z-index: 20;
+					height: 100% !important;
 				}
 
-				li .Box__BoxComponent-sc-y4nds-0 .Areas__HeaderArea-sc-8gfrea-3 .Areas__TrailingSlot-sc-8gfrea-7 button {
+				.jpzxju {
+					position: absolute !important;
+					z-index: 20 !important;
+					width: 100% !important;
+					height: 100% !important;
+				}
+				.Button-buttonTertiary-small-iconOnly-useBrowserDefaultFocusStyle-condensedAll {
+					position: absolute !important;
+					z-index: 100 !important;
+					width: 100% !important;
+					height: 100% !important;
+					padding-block: 0px !important;
+					padding-inline: 0px !important;
+				}
+				
+				/*fix padding and placing for the 'now playing' icon*/
+				.jpzxju span{
 					position: absolute;
+					display: block;
 					left: 0px;
-					width: 100% !important;
-					height: 100%;
-					z-index: 30;
-					transform: scale(1) !important;
-					border: none !important;
-					opacity: 100 !important;
+					padding: 0px !important;
 				}
-
-				li .BRX6aJUAuAsvHKD_fpbo .HeaderArea .Areas__InteractiveArea-sc-8gfrea-0 button .IconWrapper__Wrapper-sc-16usrgb-0{
+				
+				/* move all titles to the right by adding some padding, for the now playing icon*/
+				p[data-encore-id="listRowTitle"] > span {
+					padding-left: 20px !important;
+				}
+				
+				.expand-button, .collapse-button{
+					width: 100% !important;
+					height: 100% !important;
+				}
+				
+				/* hide the arrows from the folders in the library*/
+				button[data-encore-id="buttonTertiary"][aria-label="Expand folder"] svg, button[data-encore-id="buttonTertiary"][aria-label="Collapse folder"] svg {
 					display: none;
 				}
-
+				
+				/* hide the sort and view selection in the library*/
+				button[aria-controls="sort-and-view-picker"], button[aria-label="fullscreen library"] {
+					display: none;
+				}
+				
+				/* Add the new folder indicators */
 				button.collapse-button::before {
 					content: '';
 					position: absolute;
 					top: 50%;
-					left: 0px;
+					left: 10px;
 					width: 5px;
 					opacity: 100 !important;
-					height: 50%;
+					height: 50% !important;
 					background-color: ${COLLAPSE_FOLDER_INDICATOR_COLOR};
 					border-radius: 5px;
 					transform: translateY(-50%);
 				}
-
+				
 				button.expand-button::before {
 					content: '';
 					position: absolute;
 					top: 50%;
-					left: 0px;
+					left: 10px;
 					width: 5px;
 					opacity: 100%;
 					height: 50%;
@@ -80,60 +119,105 @@
 					transform: translateY(-50%);
 				}
 			`;
+
 			if (style.styleSheet) {
+				style.styleSheet.cssText = css;
 				style.styleSheet.cssText = css;
 			} else {
 				style.appendChild(document.createTextNode(css));
 			}
-			document.head.appendChild(style);
 
-			// Function to hide SVG icons in the library
-			const hideSVGIcons = () => {
-				const svgs = document.querySelectorAll('ul[aria-label="Your Library"] .Svg-img-icon-small');
-				svgs.forEach(svg => {
-					svg.style.display = 'none';  // Hide each SVG by setting display to 'none'
-				});
-			};
+			document.head.appendChild(style);
+			console.log("Styles injected");
 
 			// Function to update button borders
 			const updateFolderIndicators = () => {
+				console.log("Updating folder indicators...");
+
 				const collapseButtons = document.querySelectorAll('button[aria-label="Collapse folder"]');
 				const expandButtons = document.querySelectorAll('button[aria-label="Expand folder"]');
-				
-				// Add classes to buttons to target the ::before pseudo-element
+
+				console.log(`Found ${collapseButtons.length} collapse buttons and ${expandButtons.length} expand buttons`);
+
 				collapseButtons.forEach(button => {
-					button.classList.add('collapse-button'); // Add class for collapse button
+					button.classList.add('collapse-button');
 				});
 
 				expandButtons.forEach(button => {
-					button.classList.add('expand-button'); // Add class for expand button
+					button.classList.add('expand-button');
 				});
 			};
+			
+			// set library to custom and compact mode and refresh if we updated something
+			let shouldRefresh = false;
 
-			// Call hideSVGIcons and updateFolderIndicators when the page loads
-			hideSVGIcons();
+			for (let i = 0; i < localStorage.length; i++) {
+				const key = localStorage.key(i);
+
+				// Handle the sort order filter ID key
+				if (key.endsWith(':ylx-active-sort-order-by-filter-id')) {
+					const currentValue = localStorage.getItem(key);
+					const targetValue = JSON.stringify({"2":"4","undefined":"2"});
+
+					if (currentValue !== targetValue) {
+						console.log(`Updating ${key}:`);
+						console.log(`Old value:`, currentValue);
+						console.log(`New value:`, targetValue);
+						localStorage.setItem(key, targetValue);
+						shouldRefresh = true;
+					}
+				}
+
+				// Handle the items-view key
+				if (key.endsWith(':items-view')) {
+					const currentValue = localStorage.getItem(key);
+					const targetValue = "2";
+
+					if (currentValue !== targetValue) {
+						console.log(`Updating ${key}:`);
+						console.log(`Old value:`, currentValue);
+						console.log(`New value:`, targetValue);
+						localStorage.setItem(key, targetValue);
+						shouldRefresh = true;
+					}
+				}
+			}
+
+			if (shouldRefresh) {
+				console.log("Values updated — refreshing the page...");
+				location.reload();
+			} else {
+				console.log("No changes needed — values already correct.");
+			}
+
+
+			// Initial update
 			updateFolderIndicators();
 
-			// Create a MutationObserver to watch for changes in the page and execute hideSVGIcons & updateFolderIndicators on each update
+			// Create a MutationObserver
 			const observer = new MutationObserver((mutationsList) => {
+				let shouldUpdate = false;
+
 				mutationsList.forEach((mutation) => {
-					// Check if any added or removed nodes are relevant to our use case
 					if (mutation.type === 'childList') {
-						// Call hideSVGIcons and updateFolderIndicators on updates in the library
-						hideSVGIcons();
-						updateFolderIndicators();
+						shouldUpdate = true;
 					}
 				});
+
+				if (shouldUpdate) {
+					console.log("DOM changed, updating indicators again");
+					updateFolderIndicators();
+				}
 			});
 
-			// Observe changes in the body of the page (or a specific container if necessary)
 			const config = { childList: true, subtree: true };
 			observer.observe(document.body, config);
+
+			console.log("MutationObserver is observing DOM changes");
 		}
 
 		var app_default = main;
 
-		// Execute the function
 		(async () => {
 			await app_default();
 		})();
