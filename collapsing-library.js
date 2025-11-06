@@ -107,7 +107,7 @@
 				}
 				
 				button.expand-button::before {
-					content: '';
+					content: ''; 
 					position: absolute;
 					top: 50%;
 					left: 10px;
@@ -117,6 +117,10 @@
 					background-color: ${EXPAND_FOLDER_INDICATOR_COLOR};
 					border-radius: 5px;
 					transform: translateY(-50%);
+				}
+				
+				.main-yourLibraryX-libraryFilter, .main-yourLibraryX-filterArea, .dzzX3EujtAPhmLCH_P4S{
+					display: none !important;
 				}
 			`;
 
