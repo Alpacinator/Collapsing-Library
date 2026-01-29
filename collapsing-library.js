@@ -49,12 +49,6 @@
 					height: 100% !important;
 				}
 
-				.jpzxju {
-					position: absolute !important;
-					z-index: 20 !important;
-					width: 100% !important;
-					height: 100% !important;
-				}
 				.Button-buttonTertiary-small-iconOnly-useBrowserDefaultFocusStyle-condensedAll {
 					position: absolute !important;
 					z-index: 100 !important;
@@ -65,13 +59,20 @@
 				}
 				
 				/*fix padding and placing for the 'now playing' icon*/
+				
+				.jpzxju {
+					position: relative !important;
+					z-index: 20 !important;
+					width: 100% !important;
+					height: 100% !important;
+				}
+				
 				.jpzxju span{
-					position: absolute;
+					position: relative !important;
 					display: block;
 					left: 0px;
 					padding: 0px !important;
 				}
-				
 				/* move all titles to the right by adding some padding, for the now playing icon*/
 				p[data-encore-id="listRowTitle"] > span {
 					padding-left: 20px !important;
