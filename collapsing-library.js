@@ -144,6 +144,12 @@
 
 				console.log(`Found ${collapseButtons.length} collapse buttons and ${expandButtons.length} expand buttons`);
 
+				// Remove both classes from all buttons first
+				document.querySelectorAll('.collapse-button, .expand-button').forEach(button => {
+					button.classList.remove('collapse-button', 'expand-button');
+				});
+
+				// Then add the appropriate class
 				collapseButtons.forEach(button => {
 					button.classList.add('collapse-button');
 				});
@@ -215,7 +221,12 @@
 				}
 			});
 
-			const config = { childList: true, subtree: true };
+			const config = { 
+				childList: true, 
+				subtree: true, 
+				attributes: true, 
+				attributeFilter: ['aria-label'] 
+			};
 			observer.observe(document.body, config);
 
 			console.log("MutationObserver is observing DOM changes");
