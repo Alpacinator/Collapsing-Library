@@ -154,38 +154,30 @@
 			// Move library control div into header
 			// =========================
 			const moveLibraryDiv = () => {
-				const source = document.querySelector(
-					'#Desktop_LeftSidebar_Id > nav > div > div.main-yourLibraryX-libraryContainer.YourLibraryX > div.main-yourLibraryX-libraryItemContainer.mpdgC9UTkN5_fMm1pFiz > div:nth-child(1) > div > div.sk3cJK5EGQYAniRpE6Iz'
-				);
-
-				const target = document.querySelector(
-					'div.main-yourLibraryX-headerContent'
-				);
+				const source = document.querySelector('div.sk3cJK5EGQYAniRpE6Iz');
+				const target = document.querySelector('div.main-yourLibraryX-headerContent');
 
 				if (!source || !target) return;
-
-				// Prevent duplicate moves
 				if (source.parentElement === target) return;
 
 				target.appendChild(source);
 			};
 
-			// Initial attempt
 			moveLibraryDiv();
 
-			// Observe for React re-renders
-			const libraryMoveObserver = new MutationObserver(() => {
+			const moveObserver = new MutationObserver(() => {
 				moveLibraryDiv();
 			});
 
-			libraryMoveObserver.observe(document.body, {
+			moveObserver.observe(document.body, {
 				childList: true,
 				subtree: true
 			});
 
 			// =========================
-			// Folder indicator logic
+			// Folder indicator logic - Simple polling approach
 			// =========================
+			
 			const updateFolderIndicators = () => {
 				const collapseButtons = document.querySelectorAll('button[aria-label="Collapse folder"]');
 				const expandButtons = document.querySelectorAll('button[aria-label="Expand folder"]');
@@ -203,52 +195,15 @@
 				expandButtons.forEach(button => {
 					button.classList.add('expand-button');
 				});
-				
-				return collapseButtons.length + expandButtons.length;
 			};
 
-			// Wait for library elements to be present
-			console.log("Waiting for library elements to load...");
-			let attempts = 0;
-			const maxAttempts = 50; // 5 seconds max wait
+			// Initial update
+			updateFolderIndicators();
 
-			while (attempts < maxAttempts) {
-				const buttonCount = updateFolderIndicators();
-				if (buttonCount > 0) {
-					console.log(`Found ${buttonCount} folder buttons on attempt ${attempts + 1}`);
-					break;
-				}
-				await new Promise(resolve => setTimeout(resolve, 100));
-				attempts++;
-			}
+			// Simple polling every 500ms
+			setInterval(updateFolderIndicators, 500);
 
-			if (attempts >= maxAttempts) {
-				console.log("No folder buttons found after waiting, will rely on observer");
-			}
-
-			// Create a MutationObserver with debouncing
-			let timeoutId = null;
-			const observer = new MutationObserver((mutationsList) => {
-				// Clear existing timeout
-				if (timeoutId) {
-					clearTimeout(timeoutId);
-				}
-				
-				// Debounce updates to avoid excessive calls
-				timeoutId = setTimeout(() => {
-					updateFolderIndicators();
-				}, 50);
-			});
-
-			const config = { 
-				childList: true, 
-				subtree: true, 
-				attributes: true, 
-				attributeFilter: ['aria-label'] 
-			};
-			observer.observe(document.body, config);
-
-			console.log("MutationObserver is observing DOM changes");
+			console.log("Folder indicator polling active");
 		}
 
 		main();
