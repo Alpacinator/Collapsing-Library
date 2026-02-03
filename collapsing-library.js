@@ -31,15 +31,13 @@
 					display: none !important;
 				}
 
-				.HeaderArea {
-					position: relative !important;
-					width: 100% !important;
-					height: 100% !important;
-				}
-				
 				/* Hide elements from Your Library header */
 				.main-yourLibraryX-headerContent > div:not(.main-yourLibraryX-collapseButton):not(.sk3cJK5EGQYAniRpE6Iz) {
 					display: none;
+				}
+				
+				.main-yourLibraryX-libraryRootlist{
+					padding-left: 15px;
 				}
 				
 				.main-yourLibraryX-collapseButton h1 {
@@ -59,32 +57,11 @@
 					transition: none !important;
 				}
 				
-				/* Correcting Your episodes pin */
-				div.HeaderSideArea {
-					grid-column: 1;
-					gap: var(--encore-spacing-base, 16px);
-					display: flex;
-					left: 15px;
-					position: relative;
-				}
-				
 				div[data-encore-id="listRow"][aria-labelledby="listrow-title-spotify:collection:your-episodes"] {
 					margin-left:4px;
 					gap: 0px;
 					padding-left: 0px;
 					left: -10px;
-				}
-				
-				.Button-buttonTertiary-small-iconOnly-useBrowserDefaultFocusStyle-condensedAll {
-					position: absolute !important;
-					z-index: 100 !important;
-					width: 100% !important;
-					height: 100% !important;
-					padding: 0 !important;
-				}
-
-				p[data-encore-id="listRowTitle"] > span {
-					padding-left: 20px !important;
 				}
 
 				button[data-encore-id="buttonTertiary"][aria-label="Expand folder"] svg,
@@ -104,11 +81,12 @@
 					content: '';
 					position: absolute;
 					top: 50%;
-					left: 6px;
+					left: -5px;
 					width: 5px;
 					height: 50%;
 					transform: translateY(-50%);
 					border-radius: 5px;
+					transition: left 0.15s ease;
 				}
 
 				button.expand-button::before {
@@ -117,6 +95,11 @@
 
 				button.collapse-button::before {
 					background: ${COLLAPSE_FOLDER_INDICATOR_COLOR};
+				}
+
+				button.expand-button:hover::before,
+				button.collapse-button:hover::before {
+					left: -10px;
 				}
 			`;
 			document.head.appendChild(style);
