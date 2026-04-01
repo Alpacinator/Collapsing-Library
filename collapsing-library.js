@@ -1,4 +1,4 @@
-// Collapsing Library v5.0.0
+// Collapsing Library v5.3.0
 (async function () {
 
 	// =========================
