@@ -14,7 +14,7 @@
 		// How often (ms) to scan for new folder buttons and update their classes
 		folderPollInterval: 500,
 		// The CSS selector for the topbar action buttons row where our button is injected
-		topbarButtonsSelector: '.main-topBar-topbarContentRight .YaU17q8G6eTc2eoKRwnL',
+		topbarButtonsSelector: '.main-topBar-topbarContentRight',
 		// Default thickness of the folder indicator bars in pixels
 		expandIndicatorWidth: 5,
 	};
