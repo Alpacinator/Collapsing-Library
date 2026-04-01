@@ -1,4 +1,4 @@
-// Collapsing Library v5.1.0
+// Collapsing Library v5.0.0
 (async function () {
 
 	// =========================
@@ -17,6 +17,10 @@
 		topbarButtonsSelector: '.main-topBar-topbarContentRight',
 		// Default thickness of the folder indicator bars in pixels
 		expandIndicatorWidth: 5,
+		// Default hover offset of the folder indicator bars in pixels
+		expandIndicatorHoverOffset: 5,
+		// Default left padding of the library list in pixels
+		libraryIndent: 15,
 	};
 
 	// =========================
@@ -25,11 +29,13 @@
 	// scattered throughout the code.
 	// =========================
 	const KEYS = {
-		enforceLibraryView: 'spicetify-addon:enforce-library-view',
-		expandColor:        'spicetify-addon:expand-color',
-		collapseColor:      'spicetify-addon:collapse-color',
-		indicatorWidth:     'spicetify-addon:indicator-width',
-		hideHeaderContent:  'spicetify-addon:hide-header-content',
+		enforceLibraryView:   'spicetify-addon:enforce-library-view',
+		expandColor:          'spicetify-addon:expand-color',
+		collapseColor:        'spicetify-addon:collapse-color',
+		indicatorWidth:       'spicetify-addon:indicator-width',
+		hideHeaderContent:    'spicetify-addon:hide-header-content',
+		indicatorHoverOffset: 'spicetify-addon:indicator-hover-offset',
+		libraryIndent:        'spicetify-addon:library-indent',
 	};
 
 	// =========================
@@ -83,7 +89,7 @@
 		// =========================
 		let colorStyleEl = null;
 
-		const applyStyles = (expandColor, collapseColor, width) => {
+		const applyStyles = (expandColor, collapseColor, width, hoverOffset) => {
 			if (!colorStyleEl) {
 				colorStyleEl = document.createElement('style');
 				colorStyleEl.id = 'library-addon-colors';
@@ -93,6 +99,8 @@
 			colorStyleEl.textContent = `
 				button.expand-button::before   { background: ${expandColor}   !important; width: ${width}px !important; }
 				button.collapse-button::before { background: ${collapseColor} !important; width: ${width}px !important; }
+				button.expand-button:hover::before,
+				button.collapse-button:hover::before { left: -${hoverOffset}px !important; }
 			`;
 		};
 
@@ -117,6 +125,22 @@
 		};
 
 		// =========================
+		// Library indent style tag
+		// Toggled by the Library Indent setting.
+		// =========================
+		const applyLibraryIndent = (px) => {
+			const id = 'library-addon-indent-style';
+			let el = document.getElementById(id);
+			if (!el) {
+				el = document.createElement('style');
+				el.id = id;
+				document.head.appendChild(el);
+			}
+			el.textContent = `.main-yourLibraryX-libraryRootlist { padding-left: ${px}px !important; }`;
+			log.info('Library indent set to:', px);
+		};
+
+		// =========================
 		// SettingsPanel component
 		// A draggable floating panel rendered via Spicetify's bundled React.
 		// It is mounted into a plain <div> appended to document.body (see
@@ -136,11 +160,13 @@
 			const [expandColor,    setExpandColor]   = React.useState(getSetting(KEYS.expandColor,        CONFIG.expandIndicatorColor));
 			const [collapseColor,  setCollapseColor] = React.useState(getSetting(KEYS.collapseColor,      CONFIG.collapseIndicatorColor));
 			const [indicatorWidth, setIndicatorWidth] = React.useState(getSetting(KEYS.indicatorWidth,    CONFIG.expandIndicatorWidth));
+			const [hoverOffset,    setHoverOffset]    = React.useState(getSetting(KEYS.indicatorHoverOffset, CONFIG.expandIndicatorHoverOffset));
+			const [libraryIndent,  setLibraryIndent]  = React.useState(getSetting(KEYS.libraryIndent,        CONFIG.libraryIndent));
 
 			// Live-update the dynamic style tag whenever any visual setting changes
 			React.useEffect(() => {
-				applyStyles(expandColor, collapseColor, indicatorWidth);
-			}, [expandColor, collapseColor, indicatorWidth]);
+				applyStyles(expandColor, collapseColor, indicatorWidth, hoverOffset);
+			}, [expandColor, collapseColor, indicatorWidth, hoverOffset]);
 
 			// -- Drag logic --
 			// We store drag start coords in a ref (not state) because updating
@@ -219,13 +245,28 @@
 				log.info('Indicator width set to:', val);
 			};
 
+			const handleHoverOffset = (e) => {
+				const val = Math.min(20, Math.max(0, parseInt(e.target.value) || 0));
+				setHoverOffset(val);
+				setSetting(KEYS.indicatorHoverOffset, val);
+				log.info('Hover offset set to:', val);
+			};
+
+			const handleLibraryIndent = (e) => {
+				const val = Math.min(50, Math.max(0, parseInt(e.target.value) || 0));
+				setLibraryIndent(val);
+				setSetting(KEYS.libraryIndent, val);
+				applyLibraryIndent(val);
+				log.info('Library indent set to:', val);
+			};
+
 			// -- Inline styles --
 			// Kept inline so this file remains self-contained (no external CSS).
 			// Group them here rather than inline on each element for readability.
 			const styles = {
 				panel: {
 					position: 'fixed', left: pos.x, top: pos.y,
-					width: '300px',
+					width: 'max-content', minWidth: '300px', maxWidth: '480px',
 					background: 'rgba(30,30,30,0.88)',
 					backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
 					borderRadius: '10px',
@@ -339,9 +380,8 @@
 					React.createElement('div', { style: styles.row },
 						React.createElement('div', { style: styles.labelGroup },
 							React.createElement('span', { style: styles.label }, 'Enforce Library View'),
-							React.createElement('span', { style: styles.desc  }, 'Force compact list & custom sort order'),
+							React.createElement('span', { style: styles.desc  }, 'Always use compact list view with a fixed sort order'),
 						),
-						// Toggle pill
 						React.createElement('button', {
 							style: styles.pill(enforceView),
 							onClick: toggleEnforce,
@@ -353,8 +393,8 @@
 
 					React.createElement('div', { style: styles.row },
 						React.createElement('div', { style: styles.labelGroup },
-							React.createElement('span', { style: styles.label }, 'Hide Header Content'),
-							React.createElement('span', { style: styles.desc  }, 'Hide extra buttons in library header'),
+							React.createElement('span', { style: styles.label }, 'Hide Header Buttons'),
+							React.createElement('span', { style: styles.desc  }, 'Hide the Create and Expand buttons above the library'),
 						),
 						React.createElement('button', {
 							style: styles.pill(hideHeader),
@@ -365,18 +405,31 @@
 						)
 					),
 
+					React.createElement('div', { style: styles.row },
+						React.createElement('div', { style: styles.labelGroup },
+							React.createElement('span', { style: styles.label }, 'Library Indent'),
+							React.createElement('span', { style: styles.desc  }, 'Left padding of the library list in px (0–50)'),
+						),
+						React.createElement('input', {
+							type: 'number',
+							value: libraryIndent,
+							min: 0, max: 50,
+							onChange: handleLibraryIndent,
+							style: styles.numberInput,
+							title: 'Set library indent in pixels',
+						})
+					),
+
 					React.createElement('div', { style: styles.divider }),
 
 					// ---- Section: Folder Indicators ----
 					React.createElement('span', { style: styles.sectionLabel }, 'Folder Indicators'),
 
-					// Expand color picker row
 					React.createElement('div', { style: styles.row },
 						React.createElement('div', { style: styles.labelGroup },
-							React.createElement('span', { style: styles.label }, 'Expand Indicator'),
-							React.createElement('span', { style: styles.desc  }, 'Color shown on collapsed folders'),
+							React.createElement('span', { style: styles.label }, 'Collapsed Folder Color'),
+							React.createElement('span', { style: styles.desc  }, 'Indicator color when a folder is collapsed'),
 						),
-						// Swatch wraps a hidden <input type="color"> so we get full OS picker UX
 						React.createElement('div', { style: styles.swatch(expandColor) },
 							React.createElement('input', {
 								type: 'color', value: expandColor,
@@ -387,11 +440,10 @@
 						)
 					),
 
-					// Collapse color picker row
 					React.createElement('div', { style: styles.row },
 						React.createElement('div', { style: styles.labelGroup },
-							React.createElement('span', { style: styles.label }, 'Collapse Indicator'),
-							React.createElement('span', { style: styles.desc  }, 'Color shown on expanded folders'),
+							React.createElement('span', { style: styles.label }, 'Expanded Folder Color'),
+							React.createElement('span', { style: styles.desc  }, 'Indicator color when a folder is expanded'),
 						),
 						React.createElement('div', { style: styles.swatch(collapseColor) },
 							React.createElement('input', {
@@ -403,13 +455,11 @@
 						)
 					),
 
-					// Indicator width row
 					React.createElement('div', { style: styles.row },
 						React.createElement('div', { style: styles.labelGroup },
 							React.createElement('span', { style: styles.label }, 'Indicator Width'),
-							React.createElement('span', { style: styles.desc  }, 'Thickness in pixels (1–20)'),
+							React.createElement('span', { style: styles.desc  }, 'Thickness of the indicator bar in px (1–20)'),
 						),
-						// Number input, clamped to 1–20 in the handler
 						React.createElement('input', {
 							type: 'number',
 							value: indicatorWidth,
@@ -417,6 +467,21 @@
 							onChange: handleIndicatorWidth,
 							style: styles.numberInput,
 							title: 'Set indicator width in pixels',
+						})
+					),
+
+					React.createElement('div', { style: styles.row },
+						React.createElement('div', { style: styles.labelGroup },
+							React.createElement('span', { style: styles.label }, 'Hover Slide Distance'),
+							React.createElement('span', { style: styles.desc  }, 'How far the indicator slides left when hovered in px (0–20)'),
+						),
+						React.createElement('input', {
+							type: 'number',
+							value: hoverOffset,
+							min: 0, max: 20,
+							onChange: handleHoverOffset,
+							style: styles.numberInput,
+							title: 'Set hover slide distance in pixels',
 						})
 					)
 				)
@@ -507,8 +572,7 @@
 					display: none !important;
 				}
 
-				/* Indent the library list slightly for visual breathing room */
-				.main-yourLibraryX-libraryRootlist { padding-left: 15px; }
+				/* Indent the library list — set dynamically by applyLibraryIndent() */
 
 				/* Hide the "Your Library" heading text so only the icon shows */
 				.main-yourLibraryX-collapseButton h1 { display: none; }
@@ -550,9 +614,7 @@
 					transition: left 0.15s ease;
 				}
 
-				/* Slide the indicator further left on hover for a subtle interactive feel */
-				button.expand-button:hover::before,
-				button.collapse-button:hover::before { left: -10px; }
+				/* Slide the indicator further left on hover — set dynamically by applyStyles() */
 
 				/* Dim the topbar button slightly so it doesn't compete with Spotify's icons */
 				#library-addon-settings-btn { opacity: 0.7; transition: opacity 0.15s; cursor: pointer !important; width: 28px; height: 28px; }
@@ -565,15 +627,20 @@
 			// Apply all saved indicator settings immediately so there's no flash
 			// of default values before the settings panel is first opened
 			applyStyles(
-				getSetting(KEYS.expandColor,     CONFIG.expandIndicatorColor),
-				getSetting(KEYS.collapseColor,   CONFIG.collapseIndicatorColor),
-				getSetting(KEYS.indicatorWidth,  CONFIG.expandIndicatorWidth)
+				getSetting(KEYS.expandColor,          CONFIG.expandIndicatorColor),
+				getSetting(KEYS.collapseColor,        CONFIG.collapseIndicatorColor),
+				getSetting(KEYS.indicatorWidth,       CONFIG.expandIndicatorWidth),
+				getSetting(KEYS.indicatorHoverOffset, CONFIG.expandIndicatorHoverOffset)
 			);
 			log.info('Indicator styles applied from saved settings.');
 
 			// Apply header visibility from saved setting (default: hidden)
 			applyHeaderVisibility(getSetting(KEYS.hideHeaderContent, true));
 			log.info('Header visibility applied from saved settings.');
+
+			// Apply library indent from saved setting (default: 15px)
+			applyLibraryIndent(getSetting(KEYS.libraryIndent, CONFIG.libraryIndent));
+			log.info('Library indent applied from saved settings.');
 
 			// ---- Enforce library view (if enabled in settings) ----
 			// Checks specific localStorage keys that Spotify uses to persist
