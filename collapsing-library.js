@@ -1,4 +1,4 @@
-// Collapsing Library v5.0.0
+// Collapsing Library v5.1.0
 (async function () {
 
 	// =========================
@@ -29,6 +29,7 @@
 		expandColor:        'spicetify-addon:expand-color',
 		collapseColor:      'spicetify-addon:collapse-color',
 		indicatorWidth:     'spicetify-addon:indicator-width',
+		hideHeaderContent:  'spicetify-addon:hide-header-content',
 	};
 
 	// =========================
@@ -96,6 +97,26 @@
 		};
 
 		// =========================
+		// Header visibility style tag
+		// Toggled on/off by the Hide Header Content setting.
+		// =========================
+		const applyHeaderVisibility = (hide) => {
+			const id = 'library-addon-header-style';
+			let el = document.getElementById(id);
+			if (!el) {
+				el = document.createElement('style');
+				el.id = id;
+				document.head.appendChild(el);
+			}
+			el.textContent = hide ? `
+				.main-yourLibraryX-headerContent > div:not(:has(.main-yourLibraryX-collapseButton)):not(:has(button[aria-label="Create"])) {
+					display: none;
+				}
+			` : '';
+			log.info('Header visibility:', hide ? 'hidden' : 'visible');
+		};
+
+		// =========================
 		// SettingsPanel component
 		// A draggable floating panel rendered via Spicetify's bundled React.
 		// It is mounted into a plain <div> appended to document.body (see
@@ -111,6 +132,7 @@
 
 			// Read persisted values (or fall back to CONFIG defaults) as initial state
 			const [enforceView,    setEnforceView]   = React.useState(getSetting(KEYS.enforceLibraryView, false));
+			const [hideHeader,     setHideHeader]    = React.useState(getSetting(KEYS.hideHeaderContent,  true));
 			const [expandColor,    setExpandColor]   = React.useState(getSetting(KEYS.expandColor,        CONFIG.expandIndicatorColor));
 			const [collapseColor,  setCollapseColor] = React.useState(getSetting(KEYS.collapseColor,      CONFIG.collapseIndicatorColor));
 			const [indicatorWidth, setIndicatorWidth] = React.useState(getSetting(KEYS.indicatorWidth,    CONFIG.expandIndicatorWidth));
@@ -169,6 +191,13 @@
 				setEnforceView(next);
 				setSetting(KEYS.enforceLibraryView, next);
 				log.info('Enforce library view:', next);
+			};
+
+			const toggleHideHeader = () => {
+				const next = !hideHeader;
+				setHideHeader(next);
+				setSetting(KEYS.hideHeaderContent, next);
+				applyHeaderVisibility(next);
 			};
 
 			const handleExpandColor = (e) => {
@@ -322,6 +351,20 @@
 						)
 					),
 
+					React.createElement('div', { style: styles.row },
+						React.createElement('div', { style: styles.labelGroup },
+							React.createElement('span', { style: styles.label }, 'Hide Header Content'),
+							React.createElement('span', { style: styles.desc  }, 'Hide extra buttons in library header'),
+						),
+						React.createElement('button', {
+							style: styles.pill(hideHeader),
+							onClick: toggleHideHeader,
+							'aria-label': 'Toggle hide header content',
+						},
+							React.createElement('div', { style: styles.thumb(hideHeader) })
+						)
+					),
+
 					React.createElement('div', { style: styles.divider }),
 
 					// ---- Section: Folder Indicators ----
@@ -420,28 +463,22 @@
 		// duplicate buttons being inserted.
 		// =========================
 		const injectTopbarButton = () => {
-			// Guard: already injected
 			if (document.getElementById('library-addon-settings-btn')) return;
 
 			const targetBar = document.querySelector(CONFIG.topbarButtonsSelector);
-			if (!targetBar) return; // Topbar not rendered yet, observer will retry
+			if (!targetBar) return;
 
-			const wrapper = document.createElement('div');
 			const btn = document.createElement('button');
 			btn.id = 'library-addon-settings-btn';
 			btn.setAttribute('aria-label', 'Library Addon Settings');
-			// Mirror Spotify's own topbar button classes so it inherits their styling
-			btn.className = 'Button-sc-1dqy6lx-0 Button-buttonTertiary-small-useBrowserDefaultFocusStyle-condensedAll encore-text-body-small-bold e-91000-overflow-wrap-anywhere e-91000-button-tertiary--condensed main-topBar-buddyFeed';
-			// Open-folder SVG icon
-			btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+			btn.style.cssText = 'background: none; border: none; padding: 0; margin: 0; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-base, #fff); position: relative;';
+			btn.innerHTML = `<svg style="pointer-events: none;" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 				<path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5V6H1v-.5zm0 3v6A1.5 1.5 0 0 0 2.5 14h11a1.5 1.5 0 0 0 1.5-1.5V8a1.5 1.5 0 0 0-1.5-1.5H2.5A1.5 1.5 0 0 0 1 8v-1.5z"
 					fill="currentColor"/>
 			</svg>`;
 			btn.addEventListener('click', () => openPanel(btn.getBoundingClientRect()));
 
-			wrapper.appendChild(btn);
-			// Prepend so it appears to the left of Spotify's own action buttons
-			targetBar.insertBefore(wrapper, targetBar.firstChild);
+			targetBar.insertBefore(btn, targetBar.firstChild);
 			log.info('Topbar button injected.');
 		};
 
@@ -468,11 +505,6 @@
 				/* Hide user-specific list rows that shouldn't appear in the library */
 				div[role="button"][aria-labelledby^="listrow-title-spotify:user:"] {
 					display: none !important;
-				}
-
-				/* Hide extra header content, keeping only the collapse button and custom div */
-				.main-yourLibraryX-headerContent > div:not(.main-yourLibraryX-collapseButton):not(.sk3cJK5EGQYAniRpE6Iz) {
-					display: none;
 				}
 
 				/* Indent the library list slightly for visual breathing room */
@@ -523,7 +555,8 @@
 				button.collapse-button:hover::before { left: -10px; }
 
 				/* Dim the topbar button slightly so it doesn't compete with Spotify's icons */
-				#library-addon-settings-btn { opacity: 0.7; transition: opacity 0.15s; }
+				#library-addon-settings-btn { opacity: 0.7; transition: opacity 0.15s; cursor: pointer !important; width: 28px; height: 28px; }
+				#library-addon-settings-btn * { pointer-events: none; }
 				#library-addon-settings-btn:hover { opacity: 1; }
 			`;
 			document.head.appendChild(style);
@@ -537,6 +570,10 @@
 				getSetting(KEYS.indicatorWidth,  CONFIG.expandIndicatorWidth)
 			);
 			log.info('Indicator styles applied from saved settings.');
+
+			// Apply header visibility from saved setting (default: hidden)
+			applyHeaderVisibility(getSetting(KEYS.hideHeaderContent, true));
+			log.info('Header visibility applied from saved settings.');
 
 			// ---- Enforce library view (if enabled in settings) ----
 			// Checks specific localStorage keys that Spotify uses to persist
@@ -579,27 +616,23 @@
 			}
 
 			// ---- Move library control div into header ----
-			// Spotify sometimes renders a control div (.sk3cJK5EGQYAniRpE6Iz) outside
+			// Spotify sometimes renders a control div outside
 			// the header. We move it inside so our CSS can position it correctly.
 			// The MutationObserver re-runs the move after any DOM change because
 			// Spotify can re-render the library panel at any time.
 			const moveLibraryDiv = () => {
-				const source = document.querySelector('div.sk3cJK5EGQYAniRpE6Iz');
+				const source = document.querySelector('button[aria-label="Create"]')?.closest('div');
 				const target = document.querySelector('div.main-yourLibraryX-headerContent');
 				if (!source || !target || source.parentElement === target) return;
 				target.appendChild(source);
 				log.info('Library control div moved into header.');
 			};
 			moveLibraryDiv();
-			new MutationObserver(() => moveLibraryDiv())
+			new MutationObserver(() => { moveLibraryDiv(); injectTopbarButton(); })
 				.observe(document.body, { childList: true, subtree: true });
 
 			// ---- Topbar button ----
-			// Inject immediately, then keep an observer running so the button
-			// is re-injected if Spotify ever tears down and rebuilds the topbar.
 			injectTopbarButton();
-			new MutationObserver(() => injectTopbarButton())
-				.observe(document.body, { childList: true, subtree: true });
 
 			// ---- Folder indicator class polling ----
 			// Spotify dynamically adds and removes expand/collapse buttons as the
