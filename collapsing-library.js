@@ -1,4 +1,4 @@
-// Collapsing Library v5.6.1
+// Collapsing Library v5.6.2
 (async function () {
 
 	// =========================
@@ -547,7 +547,7 @@
 			</svg>`;
 			btn.addEventListener('click', () => openPanel(btn.getBoundingClientRect()));
 
-			targetBar.appendChild(btn);
+			targetBar.insertBefore(btn, targetBar.firstChild);
 			log.info('Topbar button injected.');
 		};
 
@@ -614,6 +614,8 @@
 				#library-addon-settings-btn { opacity: 0.7; transition: opacity 0.15s; cursor: pointer !important; width: 28px; height: 28px; }
 				#library-addon-settings-btn * { pointer-events: none; }
 				#library-addon-settings-btn:hover { opacity: 1; }
+				#global-nav-bar > div.main-globalNav-contentRight { min-width: fit-content; }
+				#global-nav-bar > div.main-globalNav-contentRight > div.link-subtle.main-topBar-topbarContentRight { min-width: fit-content; }
 			`;
 			document.head.appendChild(style);
 			log.info('Base styles injected.');
@@ -694,6 +696,7 @@
 				.observe(document.body, { childList: true, subtree: true });
 
 			// ---- Topbar button ----
+
 			injectTopbarButton();
 
 			// ---- Folder indicator class polling ----
