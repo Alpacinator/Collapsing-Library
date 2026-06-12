@@ -1,4 +1,4 @@
-// Collapsing Library v5.6.0
+// Collapsing Library v5.6.1
 (async function () {
 
 	// =========================
@@ -14,7 +14,7 @@
 		// How often (ms) to scan for new folder buttons and update their classes
 		folderPollInterval: 500,
 		// The CSS selector for the topbar action buttons row where our button is injected
-		topbarButtonsSelector: '.main-topBar-topbarContentRight',
+		topbarButtonsSelector: '.main-actionButtons-spacer.main-actionButtons',
 		// Default thickness of the folder indicator bars in pixels
 		expandIndicatorWidth: 5,
 		// Default hover offset of the folder indicator bars in pixels
@@ -547,7 +547,7 @@
 			</svg>`;
 			btn.addEventListener('click', () => openPanel(btn.getBoundingClientRect()));
 
-			targetBar.insertBefore(btn, targetBar.firstChild);
+			targetBar.appendChild(btn);
 			log.info('Topbar button injected.');
 		};
 
